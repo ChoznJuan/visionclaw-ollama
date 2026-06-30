@@ -1,4 +1,4 @@
-# Python
+# Python (VisionClaw-Ollama additions)
 __pycache__/
 *.py[cod]
 *$py.class
@@ -36,3 +36,10 @@ logs/
 # Spike scratch
 scratch/
 notes-tmp/
+
+# Android (from upstream Intent-Lab/VisionClaw)
+samples/CameraAccessAndroid/app/src/main/java/**/Secrets.kt
+samples/CameraAccessAndroid/local.properties
+samples/CameraAccessAndroid/.gradle/
+samples/CameraAccessAndroid/build/
+samples/CameraAccessAndroid/app/build/
