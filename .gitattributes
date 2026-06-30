@@ -1,0 +1,20 @@
+# Make merging from upstream/main less painful.
+#
+# These files are owned by the upstream Intent-Lab/VisionClaw project.
+# On `git fetch upstream && git merge upstream/main`, we want to keep OUR
+# versions automatically — upstream's changes flow into the history but
+# don't clobber our local documents.
+#
+# merge=ours tells git: "when this file has a conflict on merge, take
+# our version." The upstream changes are still visible via
+# `git log -p upstream/main -- <file>` if we ever need to see them.
+#
+# Add new lines here when upstream owns a file that we don't want to track.
+
+README.md merge=ours
+LICENSE merge=ours
+NOTICE merge=ours
+CHANGELOG.md merge=ours
+CODE_OF_CONDUCT.md merge=ours
+CONTRIBUTING.md merge=ours
+.gitignore merge=ours
