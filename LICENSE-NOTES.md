@@ -54,3 +54,4 @@ That's a future-Juan problem. For now, the bridge lives in this repo and inherit
 
 - **D7** in `DECISIONS.md` records the 2026-06-30 decision to keep this repo **public** (changed from the original "private" plan in the recap) due to GitHub's "public forks can't be made private" rule.
 - **2026-06-30** the LICENSE-NOTES.md was added after we discovered the upstream had no open-source license.
+- **2026-06-30** the upstream README was preserved as `UPSTREAM-README.md` during the merge to keep attribution intact without creating a `README.md` conflict. Our README is the primary entry point.
