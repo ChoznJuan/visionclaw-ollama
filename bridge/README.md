@@ -33,6 +33,38 @@ bridge/
     └── test_pipeline.py    — mock STT/LLM/TTS, verify pipeline shape
 ```
 
+## Spike result (Phase 1, 2026-06-30)
+
+✅ **The bridge is working.** Smoke test passes (text roundtrip):
+
+```bash
+cd bridge/
+python3 -m app.main    # starts on 0.0.0.0:7860
+
+# In another terminal:
+python3 scripts/smoke_test.py
+```
+
+The smoke test:
+1. Connects to `ws://localhost:7860/v1/realtime`
+2. Sends `{"setup": {...}}` → gets `{"setupComplete": {}}`
+3. Sends `{"clientContent": {"turns": [{"role": "user", "parts": [{"text": "..."}]}], "turnComplete": true}}`
+4. Gets back: `inputTranscription` echo, `outputTranscription` with the LLM's reply, then `modelTurn` with audio (or `turnComplete` if TTS fails)
+
+**What's working:**
+- WebSocket connection + Gemini Bidi protocol handshake
+- LLM roundtrip via local Ollama (`hoangquan456/qwen3-nothink:4b`, 4B params, fast)
+- Speaches STT reachable on Jetson (192.168.4.12:8000)
+- Tool call stub (Phase 2 will wire to OpenClaw)
+- `/health` and `/v1/status` endpoints
+
+**Known issue (not a bridge bug):** Speaches TTS is broken on the Jetson.
+- Kokoro model: weights file missing (`kokoro-v0_19.onnx` not found) → HTTP 422
+- Piper: returns HTTP 500 (no error body)
+- Result: bridge falls back to text-only response (turnComplete still sent, but no audio in modelTurn)
+
+**Fix:** redeploy Speaches with the missing Kokoro model file, or wire a different TTS engine. The bridge code path is correct; the failure is in the upstream service. Tracked as a Phase 1.5 ticket.
+
 ## Spike success criteria (Phase 1 done)
 
 End of Phase 1: I can `wscat` into the bridge and get a response.
@@ -80,8 +112,9 @@ The model choice is open — for realtime we want something fast. `qwen2.5:14b` 
 
 ## Punted to spike time
 
-- Vision frame handling (probably a custom message type on top of OpenAI Realtime)
-- Tool-call message shape (depends on what the client actually sends)
-- TTS choice (depends on whether we can stream audio back fast enough)
+- ~~Vision frame handling (probably a custom message type on top of OpenAI Realtime)~~ **Resolved in D3:** we speak the same Gemini Bidi protocol the upstream client uses, so no custom message types needed.
+- ~~Tool-call message shape (depends on what the client actually sends)~~ **Resolved in D3:** tool call shape is from the upstream protocol, not invented.
+- ~~TTS choice (depends on whether we can stream audio back fast enough)~~ **Resolved:** Speaches has both Kokoro and Piper loaded. The choice is which one to redeploy when we fix the broken install.
 - Auth (probably none for LAN, but reconsider for the public-facing cloudflared tunnel)
-- Whether to add `/health` and `/metrics` endpoints (yes, but cheap)
+- Whether to add `/health` and `/metrics` endpoints (`/health` and `/v1/status` are in; metrics are not)
+- **Phase 1.5:** Fix Speaches TTS (missing model file), add VAD for audio chunk flushing, add streaming TTS for sentence-by-sentence audio output

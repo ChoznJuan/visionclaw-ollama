@@ -25,19 +25,29 @@ Why we did things, in case we (or future-us) need to re-debate.
 - *LiveKit Agents*: more opinionated, would drag in a LiveKit server dependency we don't need for a single client
 - *DIY over the Gemini Live protocol*: would require us to fake the Gemini protocol, which is more brittle than speaking OpenAI Realtime
 
-## D3. OpenAI Realtime protocol, not Gemini Live
+## D3. Speak the Gemini BidiGenerateContent protocol (changed from OpenAI Realtime, 2026-06-30)
 
-**Decision:** The Android client will speak the OpenAI Realtime API protocol when pointed at our bridge.
+**Decision:** The Android client speaks the **Gemini BidiGenerateContent** WebSocket protocol (not OpenAI Realtime). Our bridge speaks the same protocol on the wire so the client needs **zero modifications** in Phase 1.
 
-**Why:**
-- pipecat's transport speaks it natively
-- The protocol is open, documented, and has 3+ open-source client implementations we can reference
-- The Android client side of the patch is a known shape (5 message types in, ~5 out)
-- Avoids the Meta DAT SDK + Gemini SDK relicense / re-architecture path
+**Why we changed our minds:** The recap from 2026-06-29 said "use OpenAI Realtime" because we assumed the Android sample used it. **It doesn't.** Reading the actual upstream code (`samples/CameraAccessAndroid/.../gemini/GeminiLiveService.kt`) shows the client speaks Gemini's Bidi protocol with these specific message types:
+- Client → Server: `{"setup": ...}`, `{"realtimeInput": {"audio"|"video", ...}}`, `{"clientContent": ...}`, `{"toolResponse": ...}`
+- Server → Client: `{"setupComplete": {}}`, `{"serverContent": {"modelTurn"|"turnComplete"|"inputTranscription"|"outputTranscription"}}`, `{"toolCall": ...}`
 
-**Punted to fork-time:**
-- Whether the protocol needs a custom serializer for vision frames (Gemini Live has dedicated frame messages; OpenAI Realtime is text-first and we'd add a `vision_frame` extension)
-- Whether to upstream the protocol extension to OpenAI's spec or just ship our own
+If we'd built the bridge to speak OpenAI Realtime, we'd have had to also patch the Android client. Speaking the same protocol the client already speaks = zero client modifications in Phase 1, all the work is server-side.
+
+**Protocol on the wire:** Gemini Bidi (matches upstream `GeminiConfig.kt`: `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent`).
+
+**Internally the bridge talks to:** Ollama (chat + vision) and Speaches (STT + TTS). The translation between Gemini Bidi and these local services is what `bridge/app/main.py` does.
+
+**Punted to Phase 1.5 / 2:**
+- VAD (voice activity detection) — currently audio chunks are buffered but not flushed. Need to add silence detection to know when the user finished speaking.
+- Streaming TTS — currently TTS is serialized (whole response → whole audio chunk). Real voice UX needs sentence-by-sentence streaming.
+- Vision frame rate throttling — upstream sends 1 frame/sec. We can subsample that.
+- Tool call wiring to OpenClaw (per D6) — the setup message would need to advertise the tool declarations.
+
+**Reference (upstream):**
+- `samples/CameraAccessAndroid/app/src/main/java/com/meta/wearable/dat/externalsampleapps/cameraaccess/gemini/GeminiConfig.kt`
+- `samples/CameraAccessAndroid/app/src/main/java/com/meta/wearable/dat/externalsampleapps/cameraaccess/gemini/GeminiLiveService.kt`
 
 ## D4. Speaches for STT, Ollama for LLM, Piper (later) for TTS
 

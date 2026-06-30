@@ -16,10 +16,10 @@ This is a local-first fork/spike of [Intent-Lab/VisionClaw](https://github.com/I
 | Phase | Goal | Status |
 |---|---|---|
 | 0 | Scaffold + design contract (this dir) | ✅ Done |
-| 1 | `bridge/` — pipecat + Ollama + Speaches + FastAPI WebSocket, end-to-end with `wscat` | 🔜 Next session |
-| 2 | `client/` — patch Intent-Lab's Android sample (GeminiConfig.kt + new OllamaRealtimeService.kt) to point at the bridge | ⏸ After 1 |
-| 3 | Glasses → bridge → Ollama voice roundtrip on device | ⏸ After 2 |
-| 4 | Already public at `ChoznJuan/visionclaw-ollama` (forked from Intent-Lab/VisionClaw) | ✅ Done |
+| 1 | `bridge/` — pipecat + Ollama + Speaches + FastAPI WebSocket, end-to-end with `wscat` | ✅ Done (text roundtrip works; TTS blocked on Speaches deployment issue, see bridge/README.md) |
+| 2 | `client/` — patch Intent-Lab's Android sample (GeminiConfig.kt + new OllamaRealtimeService.kt) to point at the bridge | ⏸ Unblocked, but no longer strictly needed (D3 changed) |
+| 3 | Glasses → bridge → Ollama voice roundtrip on device | ⏸ After Phase 1.5 (fix Speaches TTS, add VAD) |
+| 4 | Public at `ChoznJuan/visionclaw-ollama` (forked from Intent-Lab/VisionClaw) | ✅ Done |
 
 ## Architecture
 

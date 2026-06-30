@@ -1,0 +1,25 @@
+[project]
+name = "visionclaw-ollama-bridge"
+version = "0.1.0"
+description = "Local-first replacement for Gemini Live in the VisionClaw Android sample. Speaks the same Gemini BidiGenerateContent WebSocket protocol, internally runs Ollama + Speaches."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+    "websockets>=13",
+    "httpx>=0.28",
+    "pydantic>=2.9",
+    # pipecat is overkill for the spike; add when we move to Phase 2
+    # "pipecat-ai>=0.0.50",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "websocat",  # for the wscat-equivalent CLI test
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
