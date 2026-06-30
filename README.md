@@ -107,4 +107,6 @@ What that means here:
 - **No permissive license applies.** We cannot (and do not) claim MIT/Apache/BSD on this repo.
 - The upstream `LICENSE` and `NOTICE` files are kept verbatim, in the upstream history, for attribution.
 - Our additions (`bridge/`, `client/` patches, the new `README.md`, `DECISIONS.md`) are released under the same terms as the upstream — Meta's Wearables DAT Terms + GitHub's view-only public access.
-- See [`LICENSE-NOTES.md`](./LICENSE-NOTES.md) for the full breakdown of what we can and can't do with this code.
+- ## Upstream attribution
+
+The upstream README is preserved here as [`UPSTREAM-README.md`](./UPSTREAM-README.md) (381 lines) for historical context. Our additions (`bridge/`, `client/` patches, the new `README.md`, `DECISIONS.md`, `LICENSE-NOTES.md`) are released under the same terms as the upstream — Meta's Wearables DAT Terms + GitHub's view-only public access. See [`LICENSE-NOTES.md`](./LICENSE-NOTES.md) for the full breakdown of what we can and can't do with this code.
